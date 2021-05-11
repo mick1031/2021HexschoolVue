@@ -2,6 +2,20 @@
 let indexPage = {
     data: [],
 
+    // 表單
+    domTitle: document.getElementById('title'),
+    domOriginPrice: document.getElementById('origin_price'),
+    domPrice: document.getElementById('price'),
+
+    // 產品列表
+    domProductList: document.getElementById("productList"),
+    domProductCount: document.getElementById("productCount"),
+
+    // 列表內按鈕
+    domAddProduct: document.getElementById("addProduct"),
+    domClearAll:document.getElementById("clearAll"),
+
+    // 新增產品
     createProduct() {
         const model = this.getDataFromInput();
         const validResult = this.vaild(model);
@@ -15,17 +29,19 @@ let indexPage = {
         }
     },
 
+    // 從輸入表單取得資料
     getDataFromInput() {
         const obj = {
             id: Math.floor(Date.now()),
-            title: document.getElementById('title').value.trim(),
-            origin_price: parseInt(document.getElementById('origin_price').value) || 0,
-            price: parseInt(document.getElementById('price').value) || 0,
+            title: this.domTitle.value.trim(),
+            origin_price: parseInt(this.domOriginPrice.value) || 0,
+            price: parseInt(this.domPrice.value) || 0,
             is_enabled: false
         };
         return obj;
     },
 
+    // 驗證資料
     vaild(model) {
         const obj = {
             status: !model.title == "",
@@ -39,37 +55,43 @@ let indexPage = {
         return obj;
     },
 
+    // 清空表單
     clearInput() {
-        document.getElementById('title').value = "";
-        document.getElementById('origin_price').value = "";
-        document.getElementById('price').value = "";
+        this.domTitle.value = "";
+        this.domOriginPrice.value = "";
+        this.domPrice.value = "";
     },
 
+    // 更新產品狀態
     updateIsEnabled(id) {
         let model = this.data.filter(m => m.id === id)[0];
         model.is_enabled = !model.is_enabled;
         this.renderProductList();
     },
 
+    // 刪除單筆產品
     deleteRow(id) {
         this.data = this.data.filter(m => m.id !== id);
         this.renderProductList();
     },
 
+    // 刪除全部
     deleteAll() {
         this.data = [];
         this.renderProductList();
     },
 
+    // 渲染產品列表
     renderProductList() {
         let html = "";
         this.data.forEach(row => {
             html += this.template(row);
         })
-        document.getElementById("productList").innerHTML = html;
-        document.getElementById("productCount").innerHTML = this.data.length;
+        this.domProductList.innerHTML = html;
+        this.domProductCount.innerHTML = this.data.length;
     },
 
+    // 產品列表-單行框架
     template(model) {
         const html = `
             <tr>
@@ -94,13 +116,14 @@ let indexPage = {
         return html;
     },
 
+    // 初始化
     init() {
-
-        document.getElementById("addProduct").addEventListener("click", () => { this.createProduct() });
         
-        document.getElementById("clearAll").addEventListener("click", () => { this.deleteAll() });
+        this.domAddProduct.addEventListener("click", () => { this.createProduct() });
+        
+        this.domClearAll.addEventListener("click", () => { this.deleteAll() });
 
-        document.querySelector("#productList").addEventListener("click", (event) => {
+        this.domProductList.addEventListener("click", (event) => {
             const action = event.target.getAttribute("data-action");
             const id = parseInt(event.target.getAttribute("data-id"));
 
