@@ -123,24 +123,24 @@
             </div>
         </div>
     </div>
-    <div class="modal fade" id="delProductModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
+    
+    <div class="modal fade" id="delProductModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content border-0">
                 <div class="modal-header bg-danger text-white">
                     <h5 class="modal-title" id="exampleModalLabel">
                         <span>刪除產品</span>
                     </h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    是否刪除 <strong class="text-danger">{{ tempProduct.title }}</strong> 商品(刪除後將無法恢復)。
+                    是否刪除 <strong class="text-danger" id="deleteProductTItle"></strong> 商品(刪除後將無法恢復)。
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">取消</button>
-                    <button type="button" class="btn btn-danger">確認刪除</button>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-danger" id="delProduct">確認刪除</button>
                 </div>
             </div>
         </div>
@@ -157,7 +157,8 @@
     <script>
         let product = {
             data: {
-                products: []
+                products: [],
+                deleteProduct: {},
             },
 
             render() {
@@ -167,6 +168,7 @@
                 })
 
                 document.getElementById("productList").innerHTML = html;
+                document.getElementById("productCount").innerHTML = this.data.products.length;
             },
 
             createProduct() {
@@ -180,13 +182,6 @@
                 const description = document.getElementById("description");
                 const content = document.getElementById("content");
                 const is_enabled = document.getElementById("is_enabled");
-
-                const token = document.cookie
-                    .split('; ')
-                    .find(row => row.startsWith('hexToken='))
-                    .split('=')[1];
-                
-                axios.defaults.headers.common.Authorization = token;
 
                 axios.post("https://vue3-course-api.hexschool.io/api/mick1031/admin/product", {
                     data: {
@@ -218,6 +213,17 @@
                 })
             },
 
+            delProduct() {
+                axios.delete("https://vue3-course-api.hexschool.io/api/mick1031/admin/product/" + this.data.deleteProduct.id)
+                    .then((response) => {
+
+                        this.getProduct();
+
+                        const delProductModal = bootstrap.Modal.getInstance(document.getElementById('delProductModal'));
+                        delProductModal.hide();
+                    })
+            },
+
             getProduct() {
                 axios.get("https://vue3-course-api.hexschool.io/api/mick1031/products")
                     .then((response) => {
@@ -233,6 +239,25 @@
                 document.getElementById("createProduct").addEventListener("click", () => {
                     this.createProduct();
                 })
+
+                document.getElementById("delProduct").addEventListener("click", () => {
+                    this.delProduct();
+                })
+
+                document.getElementById("productList").addEventListener("click", (event) => {
+                    const id = event.target.getAttribute("data-id");
+                    this.data.deleteProduct = this.data.products.filter(m => m.id === id)[0];
+
+                    document.getElementById("deleteProductTItle").innerHTML = this.data.deleteProduct.title;
+                })
+
+                const token = document.cookie
+                    .split('; ')
+                    .find(row => row.startsWith('hexToken='))
+                    .split('=')[1];
+                
+                axios.defaults.headers.common.Authorization = token;
+
             }
         };
 
@@ -252,7 +277,7 @@
                     <span class="">${item.is_enabled ? "啟用" : "未啟用"}</span>
                 </td>
                 <td width="120">
-                    <button type="button" class="btn btn-sm btn-outline-danger move deleteBtn" data-action="remove" data-id="${item.id}" data-> 刪除 </button>
+                    <button type="button" class="btn btn-sm btn-outline-danger move deleteBtn" data-action="remove" data-id="${item.id}" data-bs-toggle="modal" data-bs-target="#delProductModal" > 刪除 </button>
                 </td>
                 </tr>
             `;
