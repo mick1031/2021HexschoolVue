@@ -13,7 +13,7 @@ let indexPage = {
 
     // 列表內按鈕
     domAddProduct: document.getElementById("addProduct"),
-    domClearAll:document.getElementById("clearAll"),
+    domClearAll: document.getElementById("clearAll"),
 
     // 新增產品
     createProduct() {
@@ -118,9 +118,9 @@ let indexPage = {
 
     // 初始化
     init() {
-        
+
         this.domAddProduct.addEventListener("click", () => { this.createProduct() });
-        
+
         this.domClearAll.addEventListener("click", () => { this.deleteAll() });
 
         this.domProductList.addEventListener("click", (event) => {
