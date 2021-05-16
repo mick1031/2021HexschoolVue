@@ -12,6 +12,7 @@
 <body>
 
     <div id="app" class="container">
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#productModal">新增產品</button>
         <table class="table mt-4">
             <thead>
                 <tr>
@@ -45,7 +46,7 @@
                     <h5 class="modal-title" id="exampleModalLabel">
                         <span>新增產品</span>
                     </h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -116,8 +117,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">取消</button>
-                    <button type="button" class="btn btn-primary">確認</button>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="createProduct">確認</button>
                 </div>
             </div>
         </div>
@@ -148,13 +149,17 @@
     <script src='https://cdnjs.cloudflare.com/ajax/libs/axios/0.9.1/axios.min.js'
         integrity='sha512-Xk3wWei2TGrsh9kDSBKUMIjw/86sLUvhtnv9f7fOuIwhhiUTKz8szkWkzHthrM5Bb3Bu9idSzkxOrkzhcneuiw=='
         crossorigin='anonymous'></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW"
+        crossorigin="anonymous"></script>
+
 
     <script>
         let product = {
             data: {
                 products: []
             },
-            
+
             render() {
                 let html = "";
                 this.data.products.forEach(function (item) {
@@ -164,12 +169,70 @@
                 document.getElementById("productList").innerHTML = html;
             },
 
-            created() {
+            createProduct() {
+
+                const imageUrl = document.getElementById("image");
+                const title = document.getElementById("title");
+                const category = document.getElementById("category");
+                const unit = document.getElementById("unit");
+                const origin_price = document.getElementById("origin_price");
+                const price = document.getElementById("price");
+                const description = document.getElementById("description");
+                const content = document.getElementById("content");
+                const is_enabled = document.getElementById("is_enabled");
+
+                const token = document.cookie
+                    .split('; ')
+                    .find(row => row.startsWith('hexToken='))
+                    .split('=')[1];
+                
+                axios.defaults.headers.common.Authorization = token;
+
+                axios.post("https://vue3-course-api.hexschool.io/api/mick1031/admin/product", {
+                    data: {
+                        title: title.value,
+                        category: category.value,
+                        origin_price: parseInt(origin_price.value),
+                        price: parseInt(price.value),
+                        unit: unit.value,
+                        description: description.value,
+                        content: content.value,
+                        is_enabled: is_enabled.value,
+                        imageUrl: imageUrl.value,
+                    }
+                }).then((response) => {
+                    const {data} = response;
+                    if(data.success) {
+                        alert(data.message);
+                        this.getProduct();
+
+                        const productModal = bootstrap.Modal.getInstance(document.getElementById('productModal'));
+                        productModal.hide();
+                        
+                    } else {
+                        alert(data.message);
+                    }
+                    
+                }).catch((error) => {
+                    console.log(error);
+                })
+            },
+
+            getProduct() {
                 axios.get("https://vue3-course-api.hexschool.io/api/mick1031/products")
                     .then((response) => {
                         this.data.products = response.data.products;
                         this.render();
                     })
+            },
+
+            created() {
+
+                this.getProduct();
+
+                document.getElementById("createProduct").addEventListener("click", () => {
+                    this.createProduct();
+                })
             }
         };
 
@@ -189,7 +252,7 @@
                     <span class="">${item.is_enabled ? "啟用" : "未啟用"}</span>
                 </td>
                 <td width="120">
-                    <button type="button" class="btn btn-sm btn-outline-danger move deleteBtn" data-action="remove" data-id=""> 刪除 </button>
+                    <button type="button" class="btn btn-sm btn-outline-danger move deleteBtn" data-action="remove" data-id="${item.id}" data-> 刪除 </button>
                 </td>
                 </tr>
             `;
