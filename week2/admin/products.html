@@ -182,19 +182,19 @@
                 const description = document.getElementById("description");
                 const content = document.getElementById("content");
                 const is_enabled = document.getElementById("is_enabled");
-
+                const data =  {
+                    title: title.value,
+                    category: category.value,
+                    origin_price: parseInt(origin_price.value),
+                    price: parseInt(price.value),
+                    unit: unit.value,
+                    description: description.value,
+                    content: content.value,
+                    is_enabled: is_enabled.checked,
+                    imageUrl: imageUrl.value,
+                };
                 axios.post("https://vue3-course-api.hexschool.io/api/mick1031/admin/product", {
-                    data: {
-                        title: title.value,
-                        category: category.value,
-                        origin_price: parseInt(origin_price.value),
-                        price: parseInt(price.value),
-                        unit: unit.value,
-                        description: description.value,
-                        content: content.value,
-                        is_enabled: is_enabled.value,
-                        imageUrl: imageUrl.value,
-                    }
+                    data
                 }).then((response) => {
                     const {data} = response;
                     if(data.success) {
