@@ -11,139 +11,167 @@
 
 <body>
 
-    <div id="app" class="container">
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#productModal">新增產品</button>
-        <table class="table mt-4">
-            <thead>
-                <tr>
-                    <th>產品名稱</th>
-                    <th width="120">
-                        原價
-                    </th>
-                    <th width="120">
-                        售價
-                    </th>
-                    <th width="150">
-                        是否啟用
-                    </th>
-                    <th width="120">
-                        刪除
-                    </th>
-                </tr>
-            </thead>
-            <tbody id="productList">
+    <div id="app">
+        <div class="container">
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#productModal">新增產品</button>
+            <table class="table mt-4">
+                <thead>
+                    <tr>
+                        <th>產品名稱</th>
+                        <th width="120">
+                            原價
+                        </th>
+                        <th width="120">
+                            售價
+                        </th>
+                        <th width="150">
+                            是否啟用
+                        </th>
+                        <th width="120">
+                            刪除
+                        </th>
+                    </tr>
+                </thead>
+                <tbody id="productList">
+                    <tr v-for="item in products" key="item.id">
+                        <td>
+                            {{item.title}}
+                        </td>
+                        <td width="120">
+                            {{item.origin_price}}
+                        </td>
+                        <td width="120">
+                            {{item.price}}
+                        </td>
+                        <td width="100">
+                            <span class="">{{item.is_enabled ? "啟用" : "未啟用"}}</span>
+                        </td>
+                        <td width="120">
+                            <button type="button" class="btn btn-sm btn-outline-danger move deleteBtn"
+                                @click="setDeleteProduct(item)" data-bs-toggle="modal"
+                                data-bs-target="#delProductModal"> 刪除 </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>目前有 {{products.length}} 項產品</p>
+        </div>
 
-            </tbody>
-        </table>
-        <p>目前有 <span id="productCount">0</span> 項產品</p>
-    </div>
-
-    <div class="modal fade" id="productModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content border-0">
-                <div class="modal-header bg-dark text-white">
-                    <h5 class="modal-title" id="exampleModalLabel">
-                        <span>新增產品</span>
-                    </h5>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-sm-4">
-                            <div class="form-group">
-                                <label for="image">輸入圖片網址</label>
-                                <input type="text" class="form-control" id="image" placeholder="請輸入圖片連結">
-                            </div>
-                            <div class="form-group">
-                                <label for="customFile">或 上傳圖片
-                                    <i class="fas fa-spinner fa-spin"></i>
-                                </label>
-                                <input type="file" id="customFile" class="form-control" ref="files">
-                            </div>
-                            <img img="https://images.unsplash.com/photo-1483985988355-763728e1935b?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=828346ed697837ce808cae68d3ddc3cf&auto=format&fit=crop&w=1350&q=80"
-                                class="img-fluid" alt="">
-                        </div>
-                        <div class="col-sm-8">
-                            <div class="form-group">
-                                <label for="title">標題</label>
-                                <input type="text" class="form-control" id="title" placeholder="請輸入標題">
-                            </div>
-
-                            <div class="form-row">
-                                <div class="form-group col-md-6">
-                                    <label for="category">分類</label>
-                                    <input type="text" class="form-control" id="category" placeholder="請輸入分類">
+        <div class="modal fade" id="productModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content border-0">
+                    <div class="modal-header bg-dark text-white">
+                        <h5 class="modal-title" id="exampleModalLabel">
+                            <span>新增產品</span>
+                        </h5>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="imageUrl">輸入圖片網址</label>
+                                    <input type="text" class="form-control" id="imageUrl" placeholder="請輸入圖片連結" 
+                                        v-model="createProduct.imageUrl">
                                 </div>
-                                <div class="form-group col-md-6">
-                                    <label for="price">單位</label>
-                                    <input type="unit" class="form-control" id="unit" placeholder="請輸入單位">
-                                </div>
-                            </div>
-
-                            <div class="form-row">
-                                <div class="form-group col-md-6">
-                                    <label for="origin_price">原價</label>
-                                    <input type="number" class="form-control" id="origin_price" placeholder="請輸入原價">
-                                </div>
-                                <div class="form-group col-md-6">
-                                    <label for="price">售價</label>
-                                    <input type="number" class="form-control" id="price" placeholder="請輸入售價">
-                                </div>
-                            </div>
-                            <hr>
-
-                            <div class="form-group">
-                                <label for="description">產品描述</label>
-                                <textarea type="text" class="form-control" id="description"
-                                    placeholder="請輸入產品描述"></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label for="content">說明內容</label>
-                                <textarea type="text" class="form-control" id="content"
-                                    placeholder="請輸入產品說明內容"></textarea>
-                            </div>
-                            <div class="form-group">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="is_enabled">
-                                    <label class="form-check-label" for="is_enabled">
-                                        是否啟用
+                                <div class="form-group">
+                                    <label for="customFile">或 上傳圖片
+                                        <i class="fas fa-spinner fa-spin"></i>
                                     </label>
+                                    <input type="file" class="form-control" ref="files" id="customFile" >
+                                </div>
+                                <img :src="createProduct.imageUrl" class="img-fluid" alt="">
+                            </div>
+                            <div class="col-sm-8">
+                                <div class="form-group">
+                                    <label for="title">標題</label>
+                                    <input type="text" class="form-control" id="title" placeholder="請輸入標題"
+                                        v-model="createProduct.title">
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        <label for="category">分類</label>
+                                        <input type="text" class="form-control" id="category" placeholder="請輸入分類"
+                                            v-model="createProduct.category">
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label for="price">單位</label>
+                                        <input type="unit" class="form-control" id="price" placeholder="請輸入單位"
+                                            v-model="createProduct.unit">
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        <label for="origin_price">原價</label>
+                                        <input type="number" class="form-control" id="origin_price" placeholder="請輸入原價"
+                                            v-model="createProduct.origin_price">
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label for="price">售價</label>
+                                        <input type="number" class="form-control" id="price" placeholder="請輸入售價"
+                                            v-model="createProduct.price">
+                                    </div>
+                                </div>
+                                <hr>
+
+                                <div class="form-group">
+                                    <label for="description">產品描述</label>
+                                    <textarea type="text" class="form-control" id="description" placeholder="請輸入產品描述"
+                                        v-model="createProduct.description"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="content">說明內容</label>
+                                    <textarea type="text" class="form-control" id="content" placeholder="請輸入產品說明內容"
+                                        v-model="createProduct.content"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="is_enabled"
+                                            v-model="createProduct.is_enabled">
+                                        <label class="form-check-label" for="is_enabled">
+                                            是否啟用
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">取消</button>
-                    <button type="button" class="btn btn-primary" id="createProduct">確認</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="modal fade" id="delProductModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content border-0">
-                <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title" id="exampleModalLabel">
-                        <span>刪除產品</span>
-                    </h5>
-                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    是否刪除 <strong class="text-danger" id="deleteProductTItle"></strong> 商品(刪除後將無法恢復)。
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">取消</button>
-                    <button type="button" class="btn btn-danger" id="delProduct">確認刪除</button>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">取消</button>
+                        <button type="button" class="btn btn-primary" @click="doCreateProduct">確認</button>
+                    </div>
                 </div>
             </div>
         </div>
+
+        <div class="modal fade" id="delProductModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content border-0">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title" id="exampleModalLabel">
+                            <span>刪除產品</span>
+                        </h5>
+                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        是否刪除 <strong class="text-danger">{{deleteProduct.title}}</strong> 商品(刪除後將無法恢復)。
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">取消</button>
+                        <button type="button" class="btn btn-danger" @click="doDeleteProduct">確認刪除</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <script src='https://cdnjs.cloudflare.com/ajax/libs/axios/0.9.1/axios.min.js'
@@ -156,137 +184,73 @@
 
     <script>
 
+        Vue.createApp({
+            data() {
+                return {
+                    products: [],
+                    deleteProduct: {},
+                    createProduct: {
 
-
-        let product = {
-            data: {
-                products: [],
-                deleteProduct: {},
-            },
-
-            render() {
-                let html = "";
-                this.data.products.forEach(function (item) {
-                    html += template(item);
-                })
-
-                document.getElementById("productList").innerHTML = html;
-                document.getElementById("productCount").innerHTML = this.data.products.length;
-            },
-
-            createProduct() {
-
-                const imageUrl = document.getElementById("image");
-                const title = document.getElementById("title");
-                const category = document.getElementById("category");
-                const unit = document.getElementById("unit");
-                const origin_price = document.getElementById("origin_price");
-                const price = document.getElementById("price");
-                const description = document.getElementById("description");
-                const content = document.getElementById("content");
-                const is_enabled = document.getElementById("is_enabled");
-                const data =  {
-                    title: title.value,
-                    category: category.value,
-                    origin_price: parseInt(origin_price.value),
-                    price: parseInt(price.value),
-                    unit: unit.value,
-                    description: description.value,
-                    content: content.value,
-                    is_enabled: is_enabled.checked,
-                    imageUrl: imageUrl.value,
-                };
-                axios.post("https://vue3-course-api.hexschool.io/api/mick1031/admin/product", {
-                    data
-                }).then((response) => {
-                    console.log(response);
-                    const {data} = response;
-                    if(data.success) {
-                        alert(data.message);
-                        this.getProduct();
-
-                        const productModal = bootstrap.Modal.getInstance(document.getElementById('productModal'));
-                        productModal.hide();
-                        
-                    } else {
-                        alert(data.message);
                     }
+                };
+            },
+            methods: {
+                getProduct() {
+                    axios.get("https://vue3-course-api.hexschool.io/api/mick1031/products")
+                        .then((response) => {
+                            this.products = response.data.products;
+                        })
+                },
+                setDeleteProduct(item) {
+                    this.deleteProduct = item;
+                },
+                doCreateProduct() {
+                    let data = {...this.createProduct};
+                    data.origin_price = parseInt(data.origin_price);
+                    data.price = parseInt(data.price);
                     
-                }).catch((error) => {
-                    console.log(error);
-                })
-            },
-
-            delProduct() {
-                axios.delete("https://vue3-course-api.hexschool.io/api/mick1031/admin/product/" + this.data.deleteProduct.id)
-                    .then((response) => {
-
-                        this.getProduct();
-
-                        const delProductModal = bootstrap.Modal.getInstance(document.getElementById('delProductModal'));
-                        delProductModal.hide();
+                    axios.post("https://vue3-course-api.hexschool.io/api/mick1031/admin/product", {
+                        data
                     })
-            },
-
-            getProduct() {
-                axios.get("https://vue3-course-api.hexschool.io/api/mick1031/products")
                     .then((response) => {
-                        this.data.products = response.data.products;
-                        this.render();
-                    })
-            },
+                        const { data } = response;
+                        if (data.success) {
+                            alert(data.message);
 
+                            this.getProduct();
+                            this.createProduct = {};
+
+                            const productModal = bootstrap.Modal.getInstance(document.getElementById('productModal'));
+                            productModal.hide();
+
+                        } else {
+                            alert(data.message);
+                        }
+
+                    }).catch((error) => {
+                        console.log(error);
+                    })
+                },
+                doDeleteProduct() {
+                    axios.delete("https://vue3-course-api.hexschool.io/api/mick1031/admin/product/" + this.deleteProduct.id)
+                        .then((response) => {
+                            const delProductModal = bootstrap.Modal.getInstance(document.getElementById('delProductModal'));
+                            delProductModal.hide();
+                        })
+                }
+            },
             created() {
-
-                this.getProduct();
-
-                document.getElementById("createProduct").addEventListener("click", () => {
-                    this.createProduct();
-                })
-
-                document.getElementById("delProduct").addEventListener("click", () => {
-                    this.delProduct();
-                })
-
-                document.getElementById("productList").addEventListener("click", (event) => {
-                    const id = event.target.getAttribute("data-id");
-                    this.data.deleteProduct = this.data.products.filter(m => m.id === id)[0];
-
-                    document.getElementById("deleteProductTItle").innerHTML = this.data.deleteProduct.title;
-                })
-
                 const token = document.cookie
                     .split('; ')
                     .find(row => row.startsWith('hexToken='))
                     .split('=')[1];
-                
+
                 axios.defaults.headers.common.Authorization = token;
 
+                this.getProduct();
             }
-        };
+        }).mount("#app");
 
-        product.created();
-
-        function template(item) {
-            var html = `
-                <tr>
-                <td>${item.title}</td>
-                <td width="120">
-                    ${item.origin_price}
-                </td>
-                <td width="120">
-                    ${item.price}
-                </td>
-                <td width="100">
-                    <span class="">${item.is_enabled ? "啟用" : "未啟用"}</span>
-                </td>
-                <td width="120">
-                    <button type="button" class="btn btn-sm btn-outline-danger move deleteBtn" data-action="remove" data-id="${item.id}" data-bs-toggle="modal" data-bs-target="#delProductModal" > 刪除 </button>
-                </td>
-                </tr>
-            `;
-            return html;
-        }
     </script>
 
 </body>
