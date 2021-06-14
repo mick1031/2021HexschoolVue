@@ -13,7 +13,8 @@
 
     <div id="app">
         <div class="container">
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#productModal">新增產品</button>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#productModal"
+                @click="setCreateProduct()">新增產品</button>
             <table class="table mt-4">
                 <thead>
                     <tr>
@@ -28,7 +29,7 @@
                             是否啟用
                         </th>
                         <th width="120">
-                            刪除
+                            功能
                         </th>
                     </tr>
                 </thead>
@@ -47,6 +48,9 @@
                             <span class="">{{item.is_enabled ? "啟用" : "未啟用"}}</span>
                         </td>
                         <td width="120">
+                            <button type="button" class="btn btn-sm btn-outline-success me-2 "
+                                @click="setEditProduct(item)" data-bs-toggle="modal" data-bs-target="#productModal"> 編輯
+                            </button>
                             <button type="button" class="btn btn-sm btn-outline-danger move deleteBtn"
                                 @click="setDeleteProduct(item)" data-bs-toggle="modal"
                                 data-bs-target="#delProductModal"> 刪除 </button>
@@ -70,38 +74,39 @@
                         </button>
                     </div>
                     <div class="modal-body">
+                        <input type="hidden" name="id" id="id" v-model="editProduct.id">
                         <div class="row">
                             <div class="col-sm-4">
                                 <div class="form-group">
                                     <label for="imageUrl">輸入圖片網址</label>
-                                    <input type="text" class="form-control" id="imageUrl" placeholder="請輸入圖片連結" 
-                                        v-model="createProduct.imageUrl">
+                                    <input type="text" class="form-control" id="imageUrl" placeholder="請輸入圖片連結"
+                                        v-model="editProduct.imageUrl">
                                 </div>
                                 <div class="form-group">
                                     <label for="customFile">或 上傳圖片
                                         <i class="fas fa-spinner fa-spin"></i>
                                     </label>
-                                    <input type="file" class="form-control" ref="files" id="customFile" >
+                                    <input type="file" class="form-control" ref="files" id="customFile">
                                 </div>
-                                <img :src="createProduct.imageUrl" class="img-fluid" alt="">
+                                <img :src="editProduct.imageUrl" class="img-fluid" alt="">
                             </div>
                             <div class="col-sm-8">
                                 <div class="form-group">
                                     <label for="title">標題</label>
                                     <input type="text" class="form-control" id="title" placeholder="請輸入標題"
-                                        v-model="createProduct.title">
+                                        v-model="editProduct.title">
                                 </div>
 
                                 <div class="form-row">
                                     <div class="form-group col-md-6">
                                         <label for="category">分類</label>
                                         <input type="text" class="form-control" id="category" placeholder="請輸入分類"
-                                            v-model="createProduct.category">
+                                            v-model="editProduct.category">
                                     </div>
                                     <div class="form-group col-md-6">
                                         <label for="price">單位</label>
                                         <input type="unit" class="form-control" id="price" placeholder="請輸入單位"
-                                            v-model="createProduct.unit">
+                                            v-model="editProduct.unit">
                                     </div>
                                 </div>
 
@@ -109,12 +114,12 @@
                                     <div class="form-group col-md-6">
                                         <label for="origin_price">原價</label>
                                         <input type="number" class="form-control" id="origin_price" placeholder="請輸入原價"
-                                            v-model="createProduct.origin_price">
+                                            v-model="editProduct.origin_price">
                                     </div>
                                     <div class="form-group col-md-6">
                                         <label for="price">售價</label>
                                         <input type="number" class="form-control" id="price" placeholder="請輸入售價"
-                                            v-model="createProduct.price">
+                                            v-model="editProduct.price">
                                     </div>
                                 </div>
                                 <hr>
@@ -122,17 +127,17 @@
                                 <div class="form-group">
                                     <label for="description">產品描述</label>
                                     <textarea type="text" class="form-control" id="description" placeholder="請輸入產品描述"
-                                        v-model="createProduct.description"></textarea>
+                                        v-model="editProduct.description"></textarea>
                                 </div>
                                 <div class="form-group">
                                     <label for="content">說明內容</label>
                                     <textarea type="text" class="form-control" id="content" placeholder="請輸入產品說明內容"
-                                        v-model="createProduct.content"></textarea>
+                                        v-model="editProduct.content"></textarea>
                                 </div>
                                 <div class="form-group">
                                     <div class="form-check">
                                         <input class="form-check-input" type="checkbox" id="is_enabled"
-                                            v-model="createProduct.is_enabled">
+                                            v-model="editProduct.is_enabled">
                                         <label class="form-check-label" for="is_enabled">
                                             是否啟用
                                         </label>
@@ -143,7 +148,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">取消</button>
-                        <button type="button" class="btn btn-primary" @click="doCreateProduct">確認</button>
+                        <button type="button" class="btn btn-primary" @click="doEditProduct">確認</button>
                     </div>
                 </div>
             </div>
@@ -189,9 +194,7 @@
                 return {
                     products: [],
                     deleteProduct: {},
-                    createProduct: {
-
-                    }
+                    editProduct: {},
                 };
             },
             methods: {
@@ -201,35 +204,51 @@
                             this.products = response.data.products;
                         })
                 },
+                setCreateProduct() {
+                    this.editProduct = {};
+                },
                 setDeleteProduct(item) {
                     this.deleteProduct = item;
                 },
-                doCreateProduct() {
-                    let data = {...this.createProduct};
+                setEditProduct(item) {
+                    this.editProduct = {...item};
+                },
+                doEditProduct() {
+                    let data = { ...this.editProduct };
                     data.origin_price = parseInt(data.origin_price);
                     data.price = parseInt(data.price);
+
+                    const api = "https://vue3-course-api.hexschool.io/"
+                    const path = "mick1031";
+                    const {id} = data;
+                    let url = `${api}api/${path}/admin/product`;
+                    let protocol = {};
+
+                    if(id !== undefined){
+                        url = `${url}/${id}`;
+                        protocol = axios.put(url, {data});
+                    } else {
+                        protocol = axios.post(url, {data});
+                    }
                     
-                    axios.post("https://vue3-course-api.hexschool.io/api/mick1031/admin/product", {
-                        data
-                    })
-                    .then((response) => {
-                        const { data } = response;
-                        if (data.success) {
-                            alert(data.message);
+                    protocol.then((response) => {
+                            const { data } = response;
+                            if (data.success) {
+                                alert(data.message);
 
-                            this.getProduct();
-                            this.createProduct = {};
+                                this.getProduct();
+                                this.editProduct = {};
 
-                            const productModal = bootstrap.Modal.getInstance(document.getElementById('productModal'));
-                            productModal.hide();
+                                const productModal = bootstrap.Modal.getInstance(document.getElementById('productModal'));
+                                productModal.hide();
 
-                        } else {
-                            alert(data.message);
-                        }
+                            } else {
+                                alert(data.message);
+                            }
 
-                    }).catch((error) => {
-                        console.log(error);
-                    })
+                        }).catch((error) => {
+                            console.log(error);
+                        })
                 },
                 doDeleteProduct() {
                     axios.delete("https://vue3-course-api.hexschool.io/api/mick1031/admin/product/" + this.deleteProduct.id)
@@ -237,7 +256,8 @@
                             const delProductModal = bootstrap.Modal.getInstance(document.getElementById('delProductModal'));
                             delProductModal.hide();
                         })
-                }
+                },
+
             },
             created() {
                 const token = document.cookie

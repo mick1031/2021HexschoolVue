@@ -54,7 +54,10 @@
                     </tr>
                 </tbody>
             </table>
-            <p>目前有 {{products.length}} 項產品</p>
+            <div class="d-flex justify-content-between">
+                <p>目前有 {{products.length}} 項產品</p>
+                <pages :page="page" @goto-page="gotoPage"></pages>
+            </div>
         </div>
 
         <div class="modal fade" id="productModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
@@ -74,14 +77,14 @@
                             <div class="col-sm-4">
                                 <div class="form-group">
                                     <label for="imageUrl">輸入圖片網址</label>
-                                    <input type="text" class="form-control" id="imageUrl" placeholder="請輸入圖片連結" 
+                                    <input type="text" class="form-control" id="imageUrl" placeholder="請輸入圖片連結"
                                         v-model="createProduct.imageUrl">
                                 </div>
                                 <div class="form-group">
                                     <label for="customFile">或 上傳圖片
                                         <i class="fas fa-spinner fa-spin"></i>
                                     </label>
-                                    <input type="file" class="form-control" ref="files" id="customFile" >
+                                    <input type="file" class="form-control" ref="files" id="customFile">
                                 </div>
                                 <img :src="createProduct.imageUrl" class="img-fluid" alt="">
                             </div>
@@ -182,11 +185,40 @@
         crossorigin="anonymous"></script>
     <script src="https://unpkg.com/vue@next"></script>
 
-    <script>
+    <script type="text/x-template" id="pagesTemplate">
+        <nav aria-label="Page navigation ">
+            <ul class="pagination">
+                <li class="page-item">
+                    <a class="page-link" href="#" aria-label="Previous" @click="reducePage">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                <li class="page-item" :class="{active: page === 1}">
+                  <a class="page-link" href="#" @click="$emit('goto-page', 1)">1</a>
+                </li>
+                <li class="page-item" :class="{active: page === 2}">
+                    <a class="page-link" href="#" @click="$emit('goto-page', 2)">2</a>
+                </li>
+                <li class="page-item" :class="{active: page === 3}">
+                    <a class="page-link" href="#" @click="$emit('goto-page', 3)">3</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="#" aria-label="Next" @click="addPage">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+          </nav>
+    </script>
 
-        Vue.createApp({
+    <script>
+        const WEB_APP_API = 'https://vue3-course-api.hexschool.io/';
+        const WEB_APP_PATH = 'mick1031';
+
+        const app = Vue.createApp({
             data() {
                 return {
+                    page: 1,
                     products: [],
                     deleteProduct: {},
                     createProduct: {
@@ -196,7 +228,7 @@
             },
             methods: {
                 getProduct() {
-                    axios.get("https://vue3-course-api.hexschool.io/api/mick1031/products")
+                    axios.get(`${WEB_APP_API}api/${WEB_APP_PATH}/admin/products?page=${this.page}`)
                         .then((response) => {
                             this.products = response.data.products;
                         })
@@ -205,31 +237,31 @@
                     this.deleteProduct = item;
                 },
                 doCreateProduct() {
-                    let data = {...this.createProduct};
+                    let data = { ...this.createProduct };
                     data.origin_price = parseInt(data.origin_price);
                     data.price = parseInt(data.price);
-                    
+
                     axios.post("https://vue3-course-api.hexschool.io/api/mick1031/admin/product", {
                         data
                     })
-                    .then((response) => {
-                        const { data } = response;
-                        if (data.success) {
-                            alert(data.message);
+                        .then((response) => {
+                            const { data } = response;
+                            if (data.success) {
+                                alert(data.message);
 
-                            this.getProduct();
-                            this.createProduct = {};
+                                this.getProduct();
+                                this.createProduct = {};
 
-                            const productModal = bootstrap.Modal.getInstance(document.getElementById('productModal'));
-                            productModal.hide();
+                                const productModal = bootstrap.Modal.getInstance(document.getElementById('productModal'));
+                                productModal.hide();
 
-                        } else {
-                            alert(data.message);
-                        }
+                            } else {
+                                alert(data.message);
+                            }
 
-                    }).catch((error) => {
-                        console.log(error);
-                    })
+                        }).catch((error) => {
+                            console.log(error);
+                        })
                 },
                 doDeleteProduct() {
                     axios.delete("https://vue3-course-api.hexschool.io/api/mick1031/admin/product/" + this.deleteProduct.id)
@@ -237,6 +269,14 @@
                             const delProductModal = bootstrap.Modal.getInstance(document.getElementById('delProductModal'));
                             delProductModal.hide();
                         })
+                },
+                gotoPage(page) {
+                    this.page = page;
+                },
+            },
+            watch: {
+                page() { 
+                    this.getProduct();
                 }
             },
             created() {
@@ -249,7 +289,32 @@
 
                 this.getProduct();
             }
-        }).mount("#app");
+        });
+        app.component("pages", {
+            template: "#pagesTemplate",
+            props: [
+                'page'
+            ],
+            methods: {
+                reducePage() {
+                    let myPage = this.page;
+                    myPage--;
+                    if (myPage < 1) {
+                        myPage = 1;
+                    }
+                    this.$emit('goto-page', myPage);
+                },
+                addPage() {
+                    let myPage = this.page;
+                    myPage++;
+                    if (myPage > 3) {
+                        myPage = 3;
+                    }
+                    this.$emit('goto-page', myPage);
+                },
+            },
+        });
+        app.mount("#app");
 
     </script>
 
