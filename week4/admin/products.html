@@ -56,7 +56,7 @@
             </table>
             <div class="d-flex justify-content-between">
                 <p>目前有 {{products.length}} 項產品</p>
-                <pages :page="page" @goto-page="gotoPage"></pages>
+                <pages :page="page" :total-pages="totalPages" @goto-page="gotoPage"></pages>
             </div>
         </div>
 
@@ -186,6 +186,7 @@
     <script src="https://unpkg.com/vue@next"></script>
 
     <script type="text/x-template" id="pagesTemplate">
+
         <nav aria-label="Page navigation ">
             <ul class="pagination">
                 <li class="page-item">
@@ -193,15 +194,13 @@
                         <span aria-hidden="true">&laquo;</span>
                     </a>
                 </li>
-                <li class="page-item" :class="{active: page === 1}">
-                  <a class="page-link" href="#" @click="$emit('goto-page', 1)">1</a>
-                </li>
-                <li class="page-item" :class="{active: page === 2}">
-                    <a class="page-link" href="#" @click="$emit('goto-page', 2)">2</a>
-                </li>
-                <li class="page-item" :class="{active: page === 3}">
-                    <a class="page-link" href="#" @click="$emit('goto-page', 3)">3</a>
-                </li>
+
+                <template v-for="index in totalPages" :key="index" >
+                    <li class="page-item" :class="{active: page === index}">
+                        <a class="page-link" href="#" @click="$emit('goto-page', index)">{{index}}</a>
+                      </li>
+                </template>
+                
                 <li class="page-item">
                     <a class="page-link" href="#" aria-label="Next" @click="addPage">
                         <span aria-hidden="true">&raquo;</span>
@@ -219,6 +218,7 @@
             data() {
                 return {
                     page: 1,
+                    totalPages: 1,
                     products: [],
                     deleteProduct: {},
                     createProduct: {
@@ -231,6 +231,7 @@
                     axios.get(`${WEB_APP_API}api/${WEB_APP_PATH}/admin/products?page=${this.page}`)
                         .then((response) => {
                             this.products = response.data.products;
+                            this.totalPages = response.data.pagination.total_pages;
                         })
                 },
                 setDeleteProduct(item) {
@@ -275,7 +276,7 @@
                 },
             },
             watch: {
-                page() { 
+                page() {
                     this.getProduct();
                 }
             },
@@ -293,7 +294,8 @@
         app.component("pages", {
             template: "#pagesTemplate",
             props: [
-                'page'
+                'page',
+                'totalPages'
             ],
             methods: {
                 reducePage() {
@@ -307,8 +309,8 @@
                 addPage() {
                     let myPage = this.page;
                     myPage++;
-                    if (myPage > 3) {
-                        myPage = 3;
+                    if (myPage > this.totalPages) {
+                        myPage = this.totalPages;
                     }
                     this.$emit('goto-page', myPage);
                 },
