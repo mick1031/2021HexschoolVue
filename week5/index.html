@@ -131,7 +131,7 @@
           <div class="mb-3">
             <label for="tel" class="form-label">收件人電話</label>
             <v-field type="text" class="form-control" id="tel" name="電話" :class="{ 'is-invalid': errors['電話'] }"
-              placeholder="請輸入電話" rules="required" v-model="user.tel">
+              placeholder="請輸入電話" rules="required|length:8" v-model="user.tel">
             </v-field>
             <error-message name="電話" class="invalid-feedback"></error-message>
           </div>
