@@ -6,7 +6,12 @@ const WEB_APP_PATH = 'mick1031';
 const app = Vue.createApp({
     data() {
         return {
-            loadingStatusItem: "",
+            loadingStatus: {
+                itemId: "",
+                quantityId: "",
+                deleteId: "",
+                submit: false,
+            },
             cart: {},
             products: [],
             product: {},
@@ -40,18 +45,39 @@ const app = Vue.createApp({
                 })
         },
         addCart(product_id, qty) {
+            this.loadingStatus.itemId = product_id;
             let item = {
                 product_id,
                 qty: parseInt(qty),
             };
             axios.post(`${WEB_APP_API}api/${WEB_APP_PATH}/cart`, { data: item })
                 .then((response) => {
+                    this.loadingStatus.itemId = '';
                     this.getCarts();
                 })
                 .catch((error) => {
-                    console.log(error)
+                    console.log(error);
+                    this.loadingStatus.itemId = '';
                 })
 
+        },
+        updateCart(row) {
+            this.loadingStatus.quantityId = row.id;
+            let item = {
+                product_id: row.product_id,
+                qty: parseInt(row.qty),
+            };
+
+            axios.put(`${WEB_APP_API}api/${WEB_APP_PATH}/cart/${row.id}`, { data: item })
+                .then((response) => {
+                    console.log(response);
+                    this.loadingStatus.quantityId = '';
+                    this.getCarts();
+                })
+                .catch((error) => {
+                    console.log(error);
+                    this.loadingStatus.quantityId = '';
+                })
         },
         clearCarts() {
             axios.delete(`${WEB_APP_API}api/${WEB_APP_PATH}/carts`)
@@ -64,18 +90,35 @@ const app = Vue.createApp({
                 })
         },
         deleteCart(id) {
+            this.loadingStatus.deleteId = id;
             axios.delete(`${WEB_APP_API}api/${WEB_APP_PATH}/cart/${id}`)
                 .then((response) => {
+                    this.loadingStatus.deleteId = '';
                     console.log(response);
                     this.getCarts();
                 })
                 .catch((error) => {
-                    console.log(error)
+                    console.log(error);
+                    this.loadingStatus.deleteId = '';
                 })
         },
         onSubmit() {
+            this.loadingStatus.submit = true;
+            const detail = {
+                user: this.user,
+                message: this.message
+            };
 
-            this.$refs.form.resetForm()
+            axios.post(`${WEB_APP_API}api/${WEB_APP_PATH}/order`, {data: detail})
+                .then((response) => {
+                    this.loadingStatus.submit = false;
+                    this.$refs.form.resetForm();
+                    this.getCarts();
+                })
+                .catch((error) => {
+                    console.log(error);
+                    this.loadingStatus.submit = false;
+                })
         },
     },
     mounted() {
