@@ -12,7 +12,9 @@ const app = Vue.createApp({
                 deleteId: "",
                 submit: false,
             },
-            cart: {},
+            cart: {
+                carts:[],
+            },
             products: [],
             product: {},
             user: {
