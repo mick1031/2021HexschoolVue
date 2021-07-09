@@ -1,6 +1,4 @@
 <template>
-  <div>
-    <h1>This is an back page</h1>
-    <router-view></router-view>
-  </div>
+  <h1>後端</h1>
+  <router-view></router-view>
 </template>

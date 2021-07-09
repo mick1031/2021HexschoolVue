@@ -13,6 +13,14 @@ const routes = [
         path: 'about',
         component: () => import('../views/About.vue'),
       },
+      {
+        path: 'products',
+        component: () => import('../views/Products.vue'),
+      },
+      {
+        path: 'cart',
+        component: () => import('../views/Cart.vue'),
+      },
     ],
   },
   {
@@ -21,11 +29,19 @@ const routes = [
     children: [
       {
         path: '',
-        component: () => import('../views/Home.vue'),
+        component: () => import('../views/admin/Home.vue'),
       },
       {
-        path: 'about',
-        component: () => import('../views/About.vue'),
+        path: 'order',
+        component: () => import('../views/admin/Order.vue'),
+      },
+      {
+        path: 'products',
+        component: () => import('../views/admin/Products.vue'),
+      },
+      {
+        path: 'coupon',
+        component: () => import('../views/admin/Coupon.vue'),
       },
     ],
   },

@@ -1,3 +1,3 @@
 <template>
-  <h2>首頁</h2>
+  <h2>購物車</h2>
 </template>
