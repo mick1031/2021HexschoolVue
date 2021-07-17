@@ -15,9 +15,7 @@
             d-flex
             align-items-center
             mb-0
-            text-white
-            text-decoration-none
-            text-custom
+            text-white text-decoration-none text-custom
             me-lg-3
             h1
           "
@@ -35,7 +33,7 @@
           "
         >
           <li>
-            <router-link class="nav-link px-2 text-white" to="/admin/product">
+            <router-link class="nav-link px-2 text-white" to="/admin/products">
               產品頁面
             </router-link>
           </li>
@@ -56,7 +54,9 @@
           </li>
         </ul>
         <div class="text-end">
-          <router-link to="/" class="btn btn-warning">登出</router-link>
+          <button type="button" class="btn btn-warning" @click="logout()">
+            登出
+          </button>
         </div>
       </div>
     </div>
@@ -67,6 +67,46 @@
 </template>
 
 <script>
+export default {
+  data() {
+    return {
+      check: false,
+    };
+  },
+  methods: {
+    logout() {
+      const url = `${process.env.VUE_APP_URL}logout`;
+      this.$http
+        .post(url)
+        .then((result) => {
+          console.log(result);
+          if (result.data.success) {
+            this.$router.push('/login');
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+  },
+  created() {
+    const token = document.cookie.replace(/(?:(?:^|.*;\s*)hexToken\s*=\s*([^;]*).*$)|^.*$/, '$1');
+    const url = `${process.env.VUE_APP_URL}api/user/check`;
+    this.$http.defaults.headers.common.Authorization = `${token}`;
+    this.$http
+      .post(url)
+      .then((result) => {
+        if (result.data.success) {
+          this.check = true;
+        } else {
+          this.$router.push('/login');
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  },
+};
 </script>
 
 <style lang="less">
